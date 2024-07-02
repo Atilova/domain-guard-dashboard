@@ -1,0 +1,20 @@
+# Vscode
+\.vscode
+
+# Virtual environment
+\venv
+
+# Environment vars
+.env.local
+
+# Log files
+\app.log
+
+# Db Migrations
+\migrations
+
+# Local Datatbase
+db.sqlite3
+
+# Project drafts
+draft.py

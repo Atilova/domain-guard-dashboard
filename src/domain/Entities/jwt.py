@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from dataclasses import dataclass
 
 from domain.Enums.jwt import JwtTokenType
@@ -27,10 +25,16 @@ class JwtTokenSignature:
 
 
 @dataclass
+class JwtTokenHolder:
+    """JwtTokenHolder"""
+
+    token: JwtToken
+    signature: JwtTokenSignature
+
+
+@dataclass
 class JwtTokenPair:
     """JwtTokenPair"""
 
-    access: JwtToken
-    access_signature: JwtTokenSignature
-    refresh: JwtToken
-    refresh_signature: JwtTokenSignature
+    access: JwtTokenHolder
+    refresh: JwtTokenHolder

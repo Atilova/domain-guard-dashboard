@@ -6,6 +6,7 @@ from typing import Iterator
 
 from application.UseCases.auth.AuthLoginUseCase import AuthLoginUseCase
 from application.UseCases.auth.AuthLogoutUseCase import AuthLogoutUseCase
+from application.UseCases.auth.AuthRefreshTokenUseCase import AuthRefreshTokenUseCase
 from application.UseCases.auth.AuthAuthenticateUserUseCase import AuthAuthenticateUserUseCase
 from application.UseCases.auth.AuthRefreshAuthenticateUserUseCase import AuthRefreshAuthenticateUserUseCase
 
@@ -50,6 +51,12 @@ class AccountInteractorFactory:
     def login(self) -> Iterator[AuthLoginUseCase]:
         yield AuthLoginUseCase(
            auth_service=self.__auth_action_service
+        )
+
+    @contextmanager
+    def refresh(self) -> Iterator[AuthRefreshTokenUseCase]:
+        yield AuthRefreshTokenUseCase(
+            auth_service=self.__auth_action_service
         )
 
     @contextmanager

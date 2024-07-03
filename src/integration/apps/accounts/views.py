@@ -11,13 +11,15 @@ from .serializers import LoginSerializer
 from integration.adapters.accounts.IAccountInteractor import IAccountInteractor
 from integration.contrib.auth.cookies import (
     set_auth_cookies,
-    get_refresh_token_cookie,
-    delete_auth_cookies
+    delete_auth_cookies,
+    set_access_token_cookie,
+    get_refresh_token_cookie
 )
 from integration.contrib.auth.authenticators.refresh import CookieBasedRefreshJWTAuthentication
 
 from application.codes.auth import AuthCodes
 from application.Dto.auth.login import AuthLoginInputDTO
+from application.Dto.auth.refresh import AuthRefreshTokenInputDTO
 from application.Dto.auth.logout import AuthLogoutInputDTO
 
 
@@ -59,6 +61,32 @@ class LoginAPIView(APIView):
         return Response(status=status.HTTP_400_BAD_REQUEST, data={ 'code': code })
 
 
+class RefreshAPIView(APIView):
+    """RefreshAPIView"""
+
+    http_method_names = ['post']
+    authentication_classes = [CookieBasedRefreshJWTAuthentication]
+
+    @inject
+    def __init__(self, ioc: IAccountInteractor=None):
+        self.__ioc = ioc
+
+    def post(self, request: Request):
+        with self.__ioc.refresh() as refresh:
+            dto = refresh(AuthRefreshTokenInputDTO(
+                refresh_token=get_refresh_token_cookie(request)
+            ))
+
+        code = dto.code
+        if code is AuthCodes.ACCESS_TOKEN_ISSUED:
+            return set_access_token_cookie(
+               Response(status=status.HTTP_204_NO_CONTENT),
+               dto.access
+            )
+        
+        return Response(status=status.HTTP_401_UNAUTHORIZED, data={ 'code': code })
+
+
 class LogoutAPIView(APIView):
     """LogoutAPIView"""
 
@@ -81,24 +109,8 @@ class LogoutAPIView(APIView):
         return response
 
 
-class RefreshAPIView(APIView):
-    """RefreshAPIView"""
-
-    http_method_names = ['post']
-    authentication_classes = [CookieBasedRefreshJWTAuthentication]
-
-    @inject
-    def __init__(self, ioc: IAccountInteractor=None):
-        self.__ioc = ioc
-
-    def post(self, request: Request):
-        return Response(status=status.HTTP_200_OK)
-
-
 class ProtectedAPIView(APIView):
     """ProtectedAPIView"""
 
     def get(self, request):
         return Response(status=status.HTTP_200_OK)
-
-

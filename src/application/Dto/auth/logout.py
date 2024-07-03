@@ -1,7 +1,5 @@
 from dataclasses import dataclass
 
-from .user import AuthenticatedUserDTO
-
 from application.codes.auth import AuthCodes
 
 

@@ -3,7 +3,11 @@ from django.contrib.auth import authenticate
 from typing import Optional, Callable
 
 from domain.Entities.auth import AppUser
-from domain.Entities.jwt import JwtTokenPair, JwtTokenSignature
+from domain.Entities.jwt import (
+    JwtTokenPair,
+    JwtTokenHolder,
+    JwtTokenSignature
+)
 from domain.ValueObjects.auth import (
     AppUserUsername,
     AppUserPassword
@@ -36,17 +40,23 @@ class AuthActionService:
 
     def login(self, user: AppUser) -> JwtTokenPair:
         token_pair = self.__jwt_service.obtain_pair(user)
-        self.__repository.link_token(user, token_pair.refresh, token_pair.refresh_signature)
+        self.__repository.link_token(user, token_pair.refresh)
 
         return token_pair
 
-    def logout(self, token: JwtToken) -> None:
+    def renew_access(self, token: JwtToken) -> Optional[JwtTokenHolder]:
+        user = self.user_from_refresh(token)
+        if user is None: return None
+
+        return self.__jwt_service.obtain_access(user)
+
+    def logout(self, token: JwtToken):
         self.__repository.invalidate_token(token)
 
-    def user_from_access(self, token: JwtToken):
+    def user_from_access(self, token: JwtToken) -> Optional[AppUser]:
        return self._user_from_token(token, self.__jwt_service.decode_access)
 
-    def user_from_refresh(self, token: JwtToken):
+    def user_from_refresh(self, token: JwtToken) -> Optional[AppUser]:
         is_active = self.__repository.token_exists(token)
         if not is_active: return None
 
@@ -55,9 +65,8 @@ class AuthActionService:
     def _user_from_token(self,
         token: JwtToken,
         decoder: Callable[[JwtToken], Optional[JwtTokenSignature]]
-    ):
+    ) -> Optional[AppUser]:
         signature = decoder(token)
         if not signature: return None
 
         return self.__repository.from_signature(signature)
-

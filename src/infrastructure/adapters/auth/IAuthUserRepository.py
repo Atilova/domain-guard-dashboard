@@ -1,7 +1,7 @@
 from typing import Protocol
 
 from domain.Entities.auth import AppUser
-from domain.Entities.jwt import JwtTokenSignature
+from domain.Entities.jwt import JwtTokenHolder, JwtTokenSignature
 from domain.ValueObjects.jwt import JwtToken
 
 
@@ -11,7 +11,7 @@ class IAuthUserRepository(Protocol):
     def from_signature(self, signature: JwtTokenSignature) -> AppUser:
         pass
 
-    def link_token(self, user: AppUser, signature: JwtTokenSignature) -> None:
+    def link_token(self, user: AppUser, token_holder: JwtTokenHolder) -> None:
         pass
 
     def token_exists(self, token: JwtToken) -> bool:

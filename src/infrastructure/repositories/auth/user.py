@@ -1,10 +1,8 @@
 from django.utils.timezone import make_aware
 
 from domain.Entities.auth import AppUser
-from domain.Entities.jwt import JwtTokenSignature
-from domain.ValueObjects.auth import (
-    AppUserId
-)
+from domain.Entities.jwt import JwtTokenHolder, JwtTokenSignature
+from domain.ValueObjects.auth import AppUserId
 from domain.ValueObjects.jwt import JwtToken
 
 from infrastructure.db.account.models import (
@@ -30,15 +28,14 @@ class AuthUserRepository:
 
     def link_token(self,
         user: AppUser,
-        refresh_token: JwtToken,
-        signature: JwtTokenSignature
+        token_holder: JwtTokenHolder
     ):
         mock_user = AppUserModel(id=user.id.raw())
         RefreshTokenModel.objects.create(
             user=mock_user,
-            token=refresh_token.raw(),
-            issued_at=make_aware(signature.iat.raw()),
-            expires_at=make_aware(signature.exp.raw())
+            token=token_holder.token.raw(),
+            issued_at=make_aware(token_holder.signature.iat.raw()),
+            expires_at=make_aware(token_holder.signature.exp.raw())
         )
 
     def token_exists(self, token: JwtToken) -> bool:

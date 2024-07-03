@@ -1,5 +1,9 @@
 from domain.Enums.jwt import JwtTokenType
-from domain.Entities.jwt import JwtTokenPair, JwtTokenSignature
+from domain.Entities.jwt import (
+    JwtTokenPair,
+    JwtTokenHolder,
+    JwtTokenSignature
+)
 from domain.ValueObjects.app import AppDateTime
 from domain.ValueObjects.auth import AppUserId
 from domain.ValueObjects.jwt import JwtToken
@@ -8,17 +12,22 @@ from domain.ValueObjects.jwt import JwtToken
 class JwtTokenService:
     """JwtTokenService"""
 
+    def new_token(self, *,
+        token: JwtToken,
+        signature: JwtTokenSignature
+    ) -> JwtTokenHolder:
+        return JwtTokenHolder(
+            token=token,
+            signature=signature
+        )
+
     def new_pair(self, *,
-        access: JwtToken,
-        access_signature: JwtTokenSignature,
-        refresh: JwtToken,
-        refresh_signature: JwtTokenSignature
+        access: JwtTokenHolder,
+        refresh: JwtTokenHolder
     ) -> JwtTokenPair:
         return JwtTokenPair(
             access=access,
-            access_signature=access_signature,
-            refresh=refresh,
-            refresh_signature=refresh_signature
+            refresh=refresh
         )
 
     def new_signature(self, *,

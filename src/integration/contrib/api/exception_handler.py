@@ -1,5 +1,3 @@
-from django.conf import settings
-
 from rest_framework import views
 
 from integration.contrib.auth.cookies import delete_auth_cookies
@@ -14,12 +12,12 @@ def _get_message_from_code(code: int, detail: str):
 
 def response(exc, context):
     """response"""
-    
+
     response = views.exception_handler(exc, context)
 
-    # if isinstance(exc, (RefreshNotAuthenticated, RefreshAuthenticationFailed)):
-        # delete_auth_cookies(response)
-        
+    if isinstance(exc, (RefreshNotAuthenticated, RefreshAuthenticationFailed)):
+        delete_auth_cookies(response)
+
     if isinstance(exc, AppAPIException):
         response.data = {
             'code': exc.code,

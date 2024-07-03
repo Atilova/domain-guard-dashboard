@@ -6,7 +6,11 @@ from typing import Optional
 
 from domain.Enums.jwt import JwtTokenType
 from domain.Entities.auth import AppUser
-from domain.Entities.jwt import JwtTokenPair, JwtTokenSignature
+from domain.Entities.jwt import (
+    JwtTokenPair,
+    JwtTokenHolder,
+    JwtTokenSignature
+)
 from domain.ValueObjects.app import AppDateTime
 from domain.ValueObjects.auth import AppUserId
 from domain.ValueObjects.jwt import JwtToken
@@ -95,17 +99,24 @@ class JwtAuthTokenService:
             algorithm=self.__config.algorithm
         )
 
+    def obtain_access(self, user: AppUser) -> JwtTokenHolder:
+        access_token, access_signature = self.__new_access(user.id)
+        return self.__service.new_token(
+            token=JwtToken(access_token),
+            signature=access_signature
+        )
+
+    def obtain_refresh(self, user: AppUser) -> JwtTokenHolder:
+        refresh_token, refresh_signature = self.__new_refresh(user.id)
+        return self.__service.new_token(
+            token=JwtToken(refresh_token),
+            signature=refresh_signature
+        )
+
     def obtain_pair(self, user: AppUser) -> JwtTokenPair:
-        user_id = user.id
-
-        access_token, access_signature = self.__new_access(user_id)
-        refresh_token, refresh_signature = self.__new_refresh(user_id)
-
         return self.__service.new_pair(
-            access=JwtToken(access_token),
-            access_signature=access_signature,
-            refresh=JwtToken(refresh_token),
-            refresh_signature=refresh_signature
+            access=self.obtain_access(user),
+            refresh=self.obtain_refresh(user)
         )
 
     def decode_token(self, token: JwtToken, token_type: JwtTokenType) -> Optional[JwtTokenSignature]:

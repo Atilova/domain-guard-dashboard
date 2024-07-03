@@ -34,12 +34,12 @@ class AuthLoginUseCase(Interactor[AuthLoginInputDTO, AuthLoginOutputDTO]):
             code=AuthCodes.TOKEN_PAIR_ISSUED,
             tokens=AuthTokens(
                 access=Token(
-                    token=token_pair.access.raw(),
-                    expires_at=token_pair.access_signature.exp.raw()
+                    token=token_pair.access.token.raw(),
+                    expires_at=token_pair.access.signature.exp.raw()
                 ),
                 refresh=Token(
-                    token=token_pair.refresh.raw(),
-                    expires_at=token_pair.refresh_signature.exp.raw()
+                    token=token_pair.refresh.token.raw(),
+                    expires_at=token_pair.refresh.signature.exp.raw()
                 )
             )
         )

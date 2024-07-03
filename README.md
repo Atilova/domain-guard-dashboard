@@ -32,4 +32,4 @@ Follows **Domain-Driven Design (DDD)** and **SOLID** principles, ensuring **core
 - include **Dockerfile** setup, **Docker-Compose** configuration for development environments.
 - add multi-factor authentication **(MFA)**.
 - add **CAPTCHA** registration validation.
-- add integration with a** notification Telegram service**.
+- add integration with a **notification Telegram service**.

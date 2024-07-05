@@ -23,7 +23,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_injector',
 
-    'infrastructure.db.account'
+    'infrastructure.db.account',
+
+    'integration.apps.cmd'
 ]
 
 MIDDLEWARE = [

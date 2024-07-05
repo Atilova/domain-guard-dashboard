@@ -14,6 +14,7 @@ from domain.ValueObjects.auth import (
 )
 from domain.ValueObjects.jwt import JwtToken
 
+from infrastructure.adapters.IRecordStorage import IRecordStorage
 from infrastructure.adapters.auth.IAuthUserService import IAuthUserService
 from infrastructure.adapters.auth.IAuthUserRepository import IAuthUserRepository
 from infrastructure.adapters.jwt.IJwtAuthTokenService import IJwtAuthTokenService
@@ -25,10 +26,12 @@ class AuthActionService:
 
     def __init__(self, *,
         service: IAuthUserService,
+        record_storage: IRecordStorage,
         jwt_service: IJwtAuthTokenService,
         repository: IAuthUserRepository
     ):
         self.__service = service
+        self.__record_storage = record_storage
         self.__jwt_service = jwt_service
         self.__repository = repository
 

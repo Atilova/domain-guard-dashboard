@@ -29,11 +29,29 @@ class JwtAuthConfig:
 
 
 @dataclass
+class RedisConfig:
+    """RedisConfig"""
+
+    host: str
+    port: int = 6379
+    user: str = ''
+    password: str = ''
+    uri: str = field(init=False)
+
+    def __post_init__(self):
+        self.uri = f'redis://{self.user}:{self.password}@{self.host}:{self.port}/'
+
+    def get_db_uri(self, db):
+        return f'{self.uri}{db}'
+
+
+@dataclass
 class AppConfig:
     """AppConfig"""
 
     django: DjangoAppConfig
     jwt_auth: JwtAuthConfig
+    redis: RedisConfig
 
 
 def load_django_app_config() -> DjangoAppConfig:
@@ -52,10 +70,26 @@ def load_jwt_auth_config() -> JwtAuthConfig:
         secret='unsafe_secrete'
     )
 
+def load_redis_config() -> RedisConfig:
+    """load_redis_config"""
+
+    host: str = os.environ.get('REDIS_HOST', 'localhost')
+    port: int = int(os.environ.get('REDIS_PORT', 6379))
+    user: str = os.environ.get('REDIS_USER', '')
+    password: str = os.environ.get('REDIS_PASSWORD', '')
+
+    return RedisConfig(
+        host=host,
+        port=port,
+        user=user,
+        password=password
+    )
+
 def load() -> AppConfig:
     """load"""
 
     return AppConfig(
         django=load_django_app_config(),
-        jwt_auth=load_jwt_auth_config()
+        jwt_auth=load_jwt_auth_config(),
+        redis=load_redis_config()
     )

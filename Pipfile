@@ -9,6 +9,8 @@ djangorestframework = "*"
 mailersend = "*"
 django-injector = "*"
 pyjwt = "*"
+redis = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
@@ -22,3 +24,4 @@ dev = "python src/manage.py runserver 0.0.0.0:8000"
 mig = "python src/manage.py migrate"
 mkmig = "python src/manage.py makemigrations"
 
+cmd-dev = "python src/manage.py dev"

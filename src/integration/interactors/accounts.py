@@ -1,5 +1,6 @@
 from config import conf
 
+from redis import Redis
 from contextlib import contextmanager
 
 from typing import Iterator
@@ -15,13 +16,15 @@ from domain.Services.jwt import JwtTokenService
 
 from infrastructure.services.auth import AuthActionService
 from infrastructure.services.jwt import JwtAuthTokenService
+from infrastructure.redis.storages.record import RedisRecordStorage
 from infrastructure.repositories.auth.user import AuthUserRepository
 
 
 class AccountInteractorFactory:
     """AccountInteractorFactory"""
 
-    def __init__(self):
+    def __init__(self, redis_client: Redis):
+        self.__redis_client = redis_client
         self.__jwt_auth_token_service = JwtAuthTokenService(
             config=conf.jwt_auth,
             service=JwtTokenService()
@@ -31,6 +34,11 @@ class AccountInteractorFactory:
         )
         self.__auth_action_service = AuthActionService(
             service=AuthUserService(),
+            record_storage=RedisRecordStorage(
+                prefix='signup',
+                client=self.__redis_client,
+                key='email'
+            ),
             jwt_service=self.__jwt_auth_token_service,
             repository=self.__auth_user_repository
         )
